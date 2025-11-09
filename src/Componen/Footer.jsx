@@ -14,7 +14,7 @@ const Footer = () => {
           <div className="flex items-center space-x-3 mb-4">
             <img
               className="w-10 h-10 rounded-full"
-              src="https://i.ibb.co.com/WpK95wS2/images.jpg" // ✅ fixed direct image link
+              src="https://i.ibb.co.com/WpK95wS2/images.jpg" 
               alt="Local Food Lovers Logo"
             />
             <h2 className="text-xl font-semibold text-white">
