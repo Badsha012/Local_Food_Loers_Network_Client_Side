@@ -27,7 +27,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative w-full perspective-1000 overflow-hidden">
+    <section className="relative w-full overflow-hidden">
       <Swiper
         loop
         effect="fade"
@@ -39,22 +39,14 @@ const Hero = () => {
         {slides.map((slide, i) => (
           <SwiperSlide key={i}>
             <div
-              className="relative h-full bg-cover bg-center flex items-center justify-start transform-style-preserve-3d"
-              style={{
-                backgroundImage: `url(${slide.image})`,
-                transform: "translateZ(-200px) scale(1.2)",
-              }}
+              className="relative h-full bg-cover bg-center flex items-center justify-start"
+              style={{ backgroundImage: `url(${slide.image})` }}
             >
-              {/* 3D Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent backdrop-blur-[1px]"></div>
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
 
-              {/* Floating Content Layer */}
-              <div
-                className="relative z-10 text-white px-6 md:px-20 max-w-2xl"
-                style={{
-                  transform: "translateZ(50px)",
-                }}
-              >
+              {/* Floating Text */}
+              <div className="relative z-10 text-white px-6 md:px-20 max-w-2xl">
                 <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-2xl animate-float">
                   {slide.heading}
                 </h1>
@@ -82,18 +74,16 @@ const Hero = () => {
       {/* Animations */}
       <style>
         {`
-          .perspective-1000 {
-            perspective: 1000px;
-          }
-
+          /* Floating Title Animation */
           @keyframes float {
-            0%, 100% { transform: translateY(0) translateZ(50px); }
-            50% { transform: translateY(-10px) translateZ(50px); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
           }
           .animate-float {
             animation: float 4s ease-in-out infinite;
           }
 
+          /* Fade In Animation for Text */
           @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -102,6 +92,7 @@ const Hero = () => {
             animation: fadeIn 1.2s ease-in-out;
           }
 
+          /* Scroll Line Animation */
           @keyframes scrollLine {
             0% { transform: scaleY(0); opacity: 0.4; }
             50% { transform: scaleY(1); opacity: 1; }

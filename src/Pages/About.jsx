@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Heart, Star, Users, Utensils } from "lucide-react";
+import { Link } from "react-router";
 
 const About = () => {
   const [showModal, setShowModal] = useState(false);
@@ -80,18 +81,18 @@ const About = () => {
               Join our foodie family — share reviews, discover dishes, and connect with others!
             </p>
             <div className="flex gap-3 justify-center">
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 Login
-              </a>
-              <a
-                href="/register"
+              </Link>
+              <Link
+                to="/register"
                 className="px-4 py-2 border border-green-600 text-green-700 rounded-lg hover:bg-green-600 hover:text-white transition"
               >
                 Register
-              </a>
+              </Link>
             </div>
             <button
               onClick={() => setShowModal(false)}

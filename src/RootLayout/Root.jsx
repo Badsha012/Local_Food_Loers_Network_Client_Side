@@ -5,13 +5,17 @@ import Footer from '../Componen/Footer';
 
 const Root = () => {
     return (
-        <div className='flex flex-col min-h-screen'>
-            <Navbar></Navbar>
-                 <div className='flex-1'>
-                <Outlet></Outlet>
-            </div>
-            <Footer></Footer>
-            
+        <div className="flex flex-col min-h-screen">
+            {/* Navbar */}
+            <Navbar />
+
+            {/* Page Content */}
+            <main className="flex-1">
+                <Outlet />
+            </main>
+
+            {/* Footer */}
+            <Footer />
         </div>
     );
 };
