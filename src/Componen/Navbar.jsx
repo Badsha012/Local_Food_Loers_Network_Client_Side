@@ -33,9 +33,6 @@ const Navbar = () => {
     }, 700);
   };
 
-  // const handleLogin = () => setUser({ name: "Badsha" });
-  // const handleLogout = () => setUser(null);
-
   return (
     <>
       {loading && <LoadingSpinner />}
@@ -70,13 +67,14 @@ const Navbar = () => {
                 key={name}
                 to={path}
                 className={({ isActive }) =>
-                  `relative pb-1 transition group ${
-                    isActive ? "text-white font-semibold" : "text-green-100"
+                  `relative px-3 py-1 rounded-md transition-all duration-300 ${
+                    isActive
+                      ? "bg-white text-green-700 font-semibold shadow-md"
+                      : "text-green-100 hover:text-white hover:bg-white/10"
                   }`
                 }
               >
                 {name}
-                <span className="absolute left-0 bottom-0 h-[2px] bg-white w-0 group-hover:w-full transition-all duration-300" />
               </NavLink>
             ))}
           </div>
@@ -110,7 +108,7 @@ const Navbar = () => {
                   Hi, <span className="font-bold">{user.name}</span>
                 </span>
                 <button
-                  
+                  onClick={() => setUser(null)}
                   className="px-3 py-1 rounded-full bg-white text-green-700 font-medium hover:bg-green-100 transition"
                 >
                   Logout
@@ -166,8 +164,10 @@ const Navbar = () => {
                 to={path}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `block px-3 py-2 rounded-md font-medium ${
-                    isActive ? "bg-green-800 text-white" : "hover:bg-green-600"
+                  `block px-3 py-2 rounded-md font-medium transition ${
+                    isActive
+                      ? "bg-white text-green-700 font-semibold"
+                      : "hover:bg-green-600"
                   }`
                 }
               >
