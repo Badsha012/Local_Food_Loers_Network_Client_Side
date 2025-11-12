@@ -34,26 +34,29 @@ const Hero = () => {
         modules={[Autoplay, Pagination, EffectFade]}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         pagination={{ clickable: true }}
-        className="h-[600px] md:h-[700px]"
+        className="h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px]"
       >
         {slides.map((slide, i) => (
           <SwiperSlide key={i}>
             <div
               className="relative h-full bg-cover bg-center flex items-center justify-start"
-              style={{ backgroundImage: `url(${slide.image})` }}
+              style={{
+                backgroundImage: `url(${slide.image})`,
+                backgroundPosition: "center center",
+              }}
             >
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
 
               {/* Floating Text */}
               <div className="relative z-10 text-white px-6 md:px-20 max-w-2xl">
-                <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-2xl animate-float">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4 drop-shadow-2xl animate-float">
                   {slide.heading}
                 </h1>
-                <p className="text-base md:text-lg mb-6 opacity-90 drop-shadow-lg animate-fadeIn">
+                <p className="text-sm sm:text-base md:text-lg mb-6 opacity-90 drop-shadow-lg animate-fadeIn">
                   {slide.text}
                 </p>
-                <button className="relative bg-green-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-green-700 transition-all duration-300 group overflow-hidden">
+                <button className="relative bg-green-600 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-green-700 transition-all duration-300 group overflow-hidden">
                   <span className="relative z-10">{slide.button}</span>
                   <span className="absolute inset-0 bg-white/20 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
                 </button>

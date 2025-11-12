@@ -9,12 +9,14 @@ import Favorites from "../Pages/Favorites";
 import AllReviews from "../Pages/AllReviews";
 import MyReviews from "../Pages/MyReviews";
 import AddReivews from "../Pages/AddReivews";
+import ErrorPage from "../Pages/ErrorPage";
 
 
 const router = createBrowserRouter([
   {
   path:'/',
     element: <Root></Root>,
+    errorElement:<ErrorPage></ErrorPage>,
     children:[
       {
         path:'/login',
