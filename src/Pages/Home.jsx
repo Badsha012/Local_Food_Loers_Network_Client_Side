@@ -4,15 +4,18 @@ import TopCities from '../Componen/TopCities';
 
 import TrendingCategories from '../Componen/TrendingCategories';
 import JoinCommunity from '../Componen/JoinCommunity';
+import FeaturedReviews from '../Componen/FeaturedReviews';
 
 const Home = () => {
   return (
     <div>
       <Hero></Hero>
+      <FeaturedReviews></FeaturedReviews>
 
-      <h1>hi</h1>
+      
       <TopCities></TopCities>
       <TrendingCategories></TrendingCategories>
+      
      
       <JoinCommunity></JoinCommunity>
       

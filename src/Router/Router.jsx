@@ -5,6 +5,10 @@ import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import About from "../Pages/About";
 import Contact from "../Pages/Contact";
+import Favorites from "../Pages/Favorites";
+import AllReviews from "../Pages/AllReviews";
+import MyReviews from "../Pages/MyReviews";
+import AddReivews from "../Pages/AddReivews";
 
 
 const router = createBrowserRouter([
@@ -34,6 +38,22 @@ const router = createBrowserRouter([
       {
         path:'/contact',
         element:<Contact></Contact>
+      },
+      {
+        path:'/favorites',
+        element:<Favorites></Favorites>
+      },
+      {
+        path:'all-reviews',
+        element:<AllReviews></AllReviews>
+      },
+      {
+        path:'/reviews',
+        element:<MyReviews></MyReviews>
+      },
+      {
+        path:'/add-reveiws',
+        element:<AddReivews></AddReivews>
       }
 
     ]
