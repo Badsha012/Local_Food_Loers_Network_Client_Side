@@ -9,17 +9,24 @@ const MyReviews = ({ user }) => {
   useEffect(() => {
     if (!user?.email) return;
 
-    fetch(`http://localhost:3000/FoodLovers?userEmail=${user.email}`)
+    fetch(
+      `https://local-food-loers-network-serve-side.vercel.app/FoodLovers?userEmail=${user.email}`
+    )
       .then((res) => res.json())
       .then((data) =>
-        setReviews(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+        setReviews(
+          data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        )
       )
       .catch((err) => console.error(err));
   }, [user]);
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/FoodLovers/${id}`, { method: "DELETE" });
+      const res = await fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/FoodLovers/${id}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error("Failed to delete review");
       setReviews((prev) => prev.filter((r) => r._id !== id));
       setDeleteId(null);
@@ -31,10 +38,14 @@ const MyReviews = ({ user }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold text-green-700 text-center mb-6">My Reviews</h2>
+      <h2 className="text-3xl font-bold text-green-700 text-center mb-6">
+        My Reviews
+      </h2>
 
       {reviews.length === 0 ? (
-        <p className="text-center text-gray-600 mt-10">You have not added any reviews yet.</p>
+        <p className="text-center text-gray-600 mt-10">
+          You have not added any reviews yet.
+        </p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white rounded-xl shadow-lg">
@@ -49,13 +60,22 @@ const MyReviews = ({ user }) => {
             </thead>
             <tbody>
               {reviews.map((r) => (
-                <tr key={r._id} className="border-b hover:bg-gray-50 transition">
+                <tr
+                  key={r._id}
+                  className="border-b hover:bg-gray-50 transition"
+                >
                   <td className="px-4 py-3">
-                    <img src={r.foodImage} alt={r.foodName} className="h-16 w-16 object-cover rounded-lg" />
+                    <img
+                      src={r.foodImage}
+                      alt={r.foodName}
+                      className="h-16 w-16 object-cover rounded-lg"
+                    />
                   </td>
                   <td className="px-4 py-3">{r.foodName}</td>
                   <td className="px-4 py-3">{r.restaurantName}</td>
-                  <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3">
+                    {new Date(r.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="px-4 py-3 space-x-2">
                     <button
                       onClick={() => navigate(`/edit-review/${r._id}`)}
@@ -81,7 +101,10 @@ const MyReviews = ({ user }) => {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg space-y-4">
             <h3 className="text-xl font-bold text-red-600">Confirm Delete</h3>
-            <p>Are you sure you want to delete this review? This action cannot be undone.</p>
+            <p>
+              Are you sure you want to delete this review? This action cannot be
+              undone.
+            </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setDeleteId(null)}

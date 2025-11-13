@@ -9,7 +9,7 @@ const FeaturedReviews = ({ user }) => {
 
   // 🟩 Load reviews & favorites
   useEffect(() => {
-    fetch("http://localhost:3000/FoodLovers")
+    fetch("https://local-food-loers-network-serve-side.vercel.app/FoodLovers")
       .then((res) => res.json())
       .then((data) => {
         const topReviews = data.sort((a, b) => b.rating - a.rating).slice(0, 6);
@@ -18,7 +18,9 @@ const FeaturedReviews = ({ user }) => {
       .catch((err) => console.error(err));
 
     if (user?.email) {
-      fetch(`http://localhost:3000/favorites/${user.email}`)
+      fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/favorites/${user.email}`
+      )
         .then((res) => res.json())
         .then((data) => setFavorites(data.map((fav) => fav.reviewId?._id)))
         .catch((err) => console.error(err));
@@ -33,9 +35,12 @@ const FeaturedReviews = ({ user }) => {
 
     if (isFav) {
       // remove favorite
-      fetch(`http://localhost:3000/favorites/${user.email}/${review._id}`, {
-        method: "DELETE",
-      })
+      fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/favorites/${user.email}/${review._id}`,
+        {
+          method: "DELETE",
+        }
+      )
         .then(() => {
           setFavorites((prev) => prev.filter((id) => id !== review._id));
           toast.success("Removed from favorites");
@@ -43,11 +48,14 @@ const FeaturedReviews = ({ user }) => {
         .catch(() => toast.error("Failed to remove favorite"));
     } else {
       // add favorite
-      fetch(`http://localhost:3000/favorites`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user.email, reviewId: review }),
-      })
+      fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/favorites`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userEmail: user.email, reviewId: review }),
+        }
+      )
         .then((res) => res.json())
         .then(() => {
           setFavorites((prev) => [...prev, review._id]);

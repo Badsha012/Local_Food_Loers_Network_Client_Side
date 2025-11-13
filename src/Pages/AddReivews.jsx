@@ -51,11 +51,14 @@ const AddReview = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/FoodLovers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "https://local-food-loers-network-serve-side.vercel.app/FoodLovers",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to add review");
 
@@ -81,20 +84,24 @@ const AddReview = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {["foodName", "foodImage", "restaurantName", "location"].map((field) => (
-            <div key={field}>
-              <label className="block font-medium mb-1">{field.replace(/([A-Z])/g, " $1")}</label>
-              <input
-                type={field === "foodImage" ? "url" : "text"}
-                name={field}
-                value={form[field]}
-                onChange={handleChange}
-                placeholder={`Enter ${field.replace(/([A-Z])/g, " $1")}`}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-              />
-            </div>
-          ))}
+          {["foodName", "foodImage", "restaurantName", "location"].map(
+            (field) => (
+              <div key={field}>
+                <label className="block font-medium mb-1">
+                  {field.replace(/([A-Z])/g, " $1")}
+                </label>
+                <input
+                  type={field === "foodImage" ? "url" : "text"}
+                  name={field}
+                  value={form[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, " $1")}`}
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                />
+              </div>
+            )
+          )}
 
           <div>
             <label className="block font-medium mb-1">Star Rating</label>

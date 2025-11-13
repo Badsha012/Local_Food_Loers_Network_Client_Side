@@ -10,7 +10,11 @@ const Favorites = () => {
   // 🔹 Fetch favorites for the logged-in user
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:3000/favorites?userEmail=${encodeURIComponent(user.email)}`)
+      fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/favorites?userEmail=${encodeURIComponent(
+          user.email
+        )}`
+      )
         .then((res) => res.json())
         .then((data) => setFavorites(data))
         .catch((err) => console.error("Failed to load favorites:", err));
@@ -30,9 +34,12 @@ const Favorites = () => {
     });
 
     if (confirm.isConfirmed) {
-      const res = await fetch(`http://localhost:3000/favorites/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `https://local-food-loers-network-serve-side.vercel.app/favorites/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (res.ok) {
         Swal.fire({
@@ -56,7 +63,8 @@ const Favorites = () => {
             💚 My Favorite Dishes
           </h2>
           <p className="text-gray-600 text-lg">
-            All your saved food reviews are here — manage and explore your top picks.
+            All your saved food reviews are here — manage and explore your top
+            picks.
           </p>
         </div>
 
