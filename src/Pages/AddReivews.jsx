@@ -9,18 +9,21 @@ const AddReview = ({ user }) => {
     foodImage: "",
     restaurantName: "",
     location: "",
-    rating: 0,
+    rating: 1,
     reviewText: "",
   });
   const [loading, setLoading] = useState(false);
 
-  // Input change handler
+  // Corrected handleChange
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "rating" ? Number(value) : value, // Rating as number
+    }));
   };
 
-  // Form submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -29,12 +32,20 @@ const AddReview = ({ user }) => {
       return;
     }
 
+    // Validate all fields
+    for (const key in form) {
+      if (!form[key]) {
+        toast.error("Please fill all fields");
+        return;
+      }
+    }
+
     setLoading(true);
 
     const payload = {
       ...form,
       userEmail: user.email,
-      reviewerName: user.name,
+      reviewerName: user.displayName || user.name || "Anonymous",
       createdAt: new Date().toISOString(),
     };
 
@@ -44,10 +55,11 @@ const AddReview = ({ user }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) throw new Error("Failed to add review");
 
       toast.success("Review added successfully!");
-      navigate("/my-reviews");
+      navigate("/my-reviews"); // Redirect to My Reviews
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong. Try again!");
@@ -134,7 +146,6 @@ const AddReview = ({ user }) => {
               onChange={handleChange}
               min={1}
               max={5}
-              placeholder="1 to 5"
               required
               className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
             />
@@ -154,7 +165,6 @@ const AddReview = ({ user }) => {
             ></textarea>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}

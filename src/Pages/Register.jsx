@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router"; // react-router-dom ব্যবহার করো
-import { auth, googleProvider } from "../firebase"; 
+import { auth, googleProvider } from "../firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -88,7 +88,9 @@ const Register = () => {
         <form onSubmit={handleRegister} className="space-y-4">
           {/* Full Name */}
           <div className="form-control">
-            <label className="label font-medium text-green-800">Full Name</label>
+            <label className="label font-medium text-green-800">
+              Full Name
+            </label>
             <div className="input input-bordered flex items-center gap-2 focus-within:ring-2 focus-within:ring-green-400 rounded-md">
               <FaUser className="text-green-600" />
               <input
@@ -120,7 +122,9 @@ const Register = () => {
 
           {/* Profile Picture URL */}
           <div className="form-control">
-            <label className="label font-medium text-green-800">Profile Picture URL</label>
+            <label className="label font-medium text-green-800">
+              Profile Picture URL
+            </label>
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none"
@@ -148,7 +152,9 @@ const Register = () => {
 
           {/* Confirm Password */}
           <div className="form-control">
-            <label className="label font-medium text-green-800">Confirm Password</label>
+            <label className="label font-medium text-green-800">
+              Confirm Password
+            </label>
             <div className="input input-bordered flex items-center gap-2 focus-within:ring-2 focus-within:ring-green-400 rounded-md">
               <FaLock className="text-green-600" />
               <input

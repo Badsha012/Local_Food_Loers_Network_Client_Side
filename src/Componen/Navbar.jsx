@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router"; // react-router-dom ব্যবহার
+import { NavLink, useNavigate } from "react-router"; 
 import { Menu, X, Sun, Moon, Search } from "lucide-react";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// 🔹 Loading Spinner Component
 const LoadingSpinner = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
     <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -18,11 +17,9 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const [dark, setDark] = useState(false);
   const [search, setSearch] = useState("");
-  const [user, setUser] = useState(null); // Firebase user state
-
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // 🔹 Monitor Firebase Auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -30,7 +27,6 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
-  // 🔹 Public links
   const publicLinks = [
     { name: "Home", path: "/" },
     { name: "All Reviews", path: "/all-reviews" },
@@ -38,9 +34,8 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  // 🔹 Protected links
   const protectedLinks = [
-    { name: "Add Review", path: "/add-reviews" },
+    { name: "Add Review", path: "/add-reveiws" },
     { name: "My Reviews", path: "/reviews" },
     { name: "My Favorites", path: "/favorites" },
   ];
@@ -62,6 +57,13 @@ const Navbar = () => {
       console.error(err);
       toast.error("❌ Logout failed!");
     }
+  };
+
+  // 🔹 Search handler
+  const handleSearch = () => {
+    if (search.trim() === "") return;
+    navigate(`/all-reviews?search=${encodeURIComponent(search)}`);
+    setOpen(false);
   };
 
   return (
@@ -132,9 +134,16 @@ const Navbar = () => {
                 placeholder="Search food..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="pl-8 pr-3 py-1.5 rounded-full text-sm text-black outline-none w-36 focus:w-48 transition-all"
               />
             </div>
+            <button
+              onClick={handleSearch}
+              className="px-3 py-1 rounded-full bg-white text-green-700 font-medium hover:bg-green-100 transition"
+            >
+              Search
+            </button>
 
             {/* Theme Toggle */}
             <button
@@ -188,7 +197,6 @@ const Navbar = () => {
         {/* MOBILE DROPDOWN */}
         {open && (
           <div className="lg:hidden bg-green-700 text-white shadow-md px-4 pb-4 space-y-3 animate-fadeIn">
-            {/* Search */}
             <div className="flex items-center gap-2 py-2">
               <Search size={18} />
               <input
@@ -196,9 +204,16 @@ const Navbar = () => {
                 placeholder="Search food..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="w-full px-3 py-1.5 rounded-md text-black outline-none"
               />
             </div>
+            <button
+              onClick={handleSearch}
+              className="w-full px-3 py-1 rounded-full bg-white text-green-700 font-medium hover:bg-green-100 transition"
+            >
+              Search
+            </button>
 
             {/* Menu Items */}
             {publicLinks.map(({ name, path }) => (

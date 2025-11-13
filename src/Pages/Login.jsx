@@ -19,7 +19,11 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const photoURL = userCredential.user.photoURL || "";
       setUserPhoto(photoURL);
 

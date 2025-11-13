@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 
-const MyFavorites = ({ user }) => {
+const Favorites = ({ user }) => {
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
@@ -9,16 +9,12 @@ const MyFavorites = ({ user }) => {
 
     fetch(`http://localhost:3000/favorites/${user.email}`)
       .then(res => res.json())
-      .then(data => {
-        setFavorites(data.map(fav => fav.reviewId));
-      })
+      .then(data => setFavorites(data.map(f => f.reviewId)))
       .catch(err => console.error("Error fetching favorites:", err));
   }, [user]);
 
   const handleRemove = (id) => {
-    fetch(`http://localhost:3000/favorites/${user.email}/${id}`, {
-      method: "DELETE",
-    })
+    fetch(`http://localhost:3000/favorites/${user.email}/${id}`, { method: "DELETE" })
       .then(() => {
         setFavorites(prev => prev.filter(r => r._id !== id));
         toast.success("Removed from favorites");
@@ -53,7 +49,6 @@ const MyFavorites = ({ user }) => {
                   <h3 className="text-2xl font-semibold text-gray-800">{r.foodName}</h3>
                   <p className="text-gray-600 font-medium">{r.restaurantName}</p>
                   <p className="text-gray-500 text-sm">{r.location}</p>
-
                   <div className="flex justify-between items-center">
                     <p className="text-yellow-500 font-bold">⭐ {r.rating}</p>
                     <button
@@ -73,4 +68,4 @@ const MyFavorites = ({ user }) => {
   );
 };
 
-export default MyFavorites;
+export default Favorites;
