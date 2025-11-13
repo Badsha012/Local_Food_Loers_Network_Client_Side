@@ -3,31 +3,30 @@ import { useNavigate } from "react-router";
 
 const MyReviews = ({ user }) => {
   const [reviews, setReviews] = useState([]);
-  const [deleteId, setDeleteId] = useState(null); // for modal
+  const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch reviews of logged-in user
   useEffect(() => {
-    if (user?.email) {
-      fetch(`http://localhost:3000/FoodLovers?userEmail=${user.email}`)
-        .then(res => res.json())
-        .then(data => {
-          // Sort reviews by newest first
-          const sorted = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          setReviews(sorted);
-        })
-        .catch(err => console.error(err));
-    }
+    if (!user?.email) return;
+
+    fetch(`http://localhost:3000/FoodLovers?userEmail=${user.email}`)
+      .then((res) => res.json())
+      .then((data) =>
+        setReviews(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+      )
+      .catch((err) => console.error(err));
   }, [user]);
 
-  // Delete review
-  const handleDelete = (id) => {
-    fetch(`http://localhost:3000/FoodLovers/${id}`, { method: "DELETE" })
-      .then(() => {
-        setReviews(prev => prev.filter(r => r._id !== id));
-        setDeleteId(null);
-      })
-      .catch(err => console.error(err));
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:3000/FoodLovers/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete review");
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+      setDeleteId(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete review");
+    }
   };
 
   return (
@@ -49,14 +48,10 @@ const MyReviews = ({ user }) => {
               </tr>
             </thead>
             <tbody>
-              {reviews.map(r => (
+              {reviews.map((r) => (
                 <tr key={r._id} className="border-b hover:bg-gray-50 transition">
                   <td className="px-4 py-3">
-                    <img
-                      src={r.foodImage}
-                      alt={r.foodName}
-                      className="h-16 w-16 object-cover rounded-lg"
-                    />
+                    <img src={r.foodImage} alt={r.foodName} className="h-16 w-16 object-cover rounded-lg" />
                   </td>
                   <td className="px-4 py-3">{r.foodName}</td>
                   <td className="px-4 py-3">{r.restaurantName}</td>
@@ -82,7 +77,6 @@ const MyReviews = ({ user }) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg space-y-4">

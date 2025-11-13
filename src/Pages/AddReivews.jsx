@@ -4,7 +4,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 
 const AddReview = () => {
-  const { user } = useAuth(); // Get current logged-in user
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ const AddReview = () => {
       return;
     }
 
-    // Validate all fields
+    // Check all fields
     for (const key in form) {
       if (!form[key]) {
         toast.error("Please fill all fields");
@@ -46,7 +46,7 @@ const AddReview = () => {
     const payload = {
       ...form,
       userEmail: user.email,
-      reviewerName: user.displayName || user.name || "Anonymous",
+      reviewerName: user.displayName || "Anonymous",
       createdAt: new Date().toISOString(),
     };
 
@@ -60,7 +60,7 @@ const AddReview = () => {
       if (!res.ok) throw new Error("Failed to add review");
 
       toast.success("Review added successfully!");
-      navigate("/my-reviews"); // Redirect after adding review
+      navigate("/my-reviews");
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong. Try again!");
@@ -81,63 +81,21 @@ const AddReview = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Food Name */}
-          <div>
-            <label className="block font-medium mb-1">Food Name</label>
-            <input
-              type="text"
-              name="foodName"
-              value={form.foodName}
-              onChange={handleChange}
-              placeholder="Enter food name"
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-            />
-          </div>
+          {["foodName", "foodImage", "restaurantName", "location"].map((field) => (
+            <div key={field}>
+              <label className="block font-medium mb-1">{field.replace(/([A-Z])/g, " $1")}</label>
+              <input
+                type={field === "foodImage" ? "url" : "text"}
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                placeholder={`Enter ${field.replace(/([A-Z])/g, " $1")}`}
+                required
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+              />
+            </div>
+          ))}
 
-          {/* Food Image */}
-          <div>
-            <label className="block font-medium mb-1">Food Image URL</label>
-            <input
-              type="url"
-              name="foodImage"
-              value={form.foodImage}
-              onChange={handleChange}
-              placeholder="Enter image URL"
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-            />
-          </div>
-
-          {/* Restaurant Name */}
-          <div>
-            <label className="block font-medium mb-1">Restaurant Name</label>
-            <input
-              type="text"
-              name="restaurantName"
-              value={form.restaurantName}
-              onChange={handleChange}
-              placeholder="Enter restaurant name"
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-            />
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="block font-medium mb-1">Location</label>
-            <input
-              type="text"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              placeholder="City or area"
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-            />
-          </div>
-
-          {/* Rating */}
           <div>
             <label className="block font-medium mb-1">Star Rating</label>
             <input
@@ -152,7 +110,6 @@ const AddReview = () => {
             />
           </div>
 
-          {/* Review Text */}
           <div>
             <label className="block font-medium mb-1">Review Text</label>
             <textarea
@@ -163,7 +120,7 @@ const AddReview = () => {
               placeholder="Share your experience..."
               required
               className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition resize-none"
-            ></textarea>
+            />
           </div>
 
           <button
