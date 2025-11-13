@@ -7,6 +7,7 @@ const FeaturedReviews = ({ user }) => {
   const [favorites, setFavorites] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
 
+  // 🟩 Load reviews & favorites
   useEffect(() => {
     fetch("http://localhost:3000/FoodLovers")
       .then((res) => res.json())
@@ -19,43 +20,54 @@ const FeaturedReviews = ({ user }) => {
     if (user?.email) {
       fetch(`http://localhost:3000/favorites/${user.email}`)
         .then((res) => res.json())
-        .then((data) => setFavorites(data.map(fav => fav.reviewId._id)))
-        .catch(err => console.error(err));
+        .then((data) => setFavorites(data.map((fav) => fav.reviewId?._id)))
+        .catch((err) => console.error(err));
     }
   }, [user]);
 
+  // 🟩 Add or Remove Favorite
   const toggleFavorite = (review) => {
     if (!user) return toast.error("Please login to add favorites");
 
     const isFav = favorites.includes(review._id);
 
     if (isFav) {
-      fetch(`http://localhost:3000/favorites/${user.email}/${review._id}`, { method: "DELETE" })
+      // remove favorite
+      fetch(`http://localhost:3000/favorites/${user.email}/${review._id}`, {
+        method: "DELETE",
+      })
         .then(() => {
-          setFavorites(prev => prev.filter(id => id !== review._id));
+          setFavorites((prev) => prev.filter((id) => id !== review._id));
           toast.success("Removed from favorites");
-        });
+        })
+        .catch(() => toast.error("Failed to remove favorite"));
     } else {
+      // add favorite
       fetch(`http://localhost:3000/favorites`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user.email, reviewId: review })
-      }).then(() => {
-        setFavorites(prev => [...prev, review._id]);
-        toast.success("Added to favorites");
-      });
+        body: JSON.stringify({ userEmail: user.email, reviewId: review }),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          setFavorites((prev) => [...prev, review._id]);
+          toast.success("Added to favorites");
+        })
+        .catch(() => toast.error("Failed to add favorite"));
     }
   };
 
+  // 🟩 Copy to Clipboard
   const handleShare = (review) => {
-    navigator.clipboard.writeText(
-      `Check this food review: ${review.foodName} at ${review.restaurantName}!`
-    ).then(() => toast.success("Copied review info to clipboard!"));
+    navigator.clipboard
+      .writeText(
+        `Check this food review: ${review.foodName} at ${review.restaurantName}!`
+      )
+      .then(() => toast.success("Copied review info to clipboard!"));
   };
 
   return (
     <>
-      
       <Toaster position="top-right" />
 
       <section className="bg-gradient-to-b from-green-50 to-green-100 py-20 px-10 min-h-[80vh]">
@@ -64,21 +76,33 @@ const FeaturedReviews = ({ user }) => {
             Featured Reviews
           </h2>
           <p className="text-gray-700 max-w-2xl mx-auto text-lg md:text-xl">
-            Discover the top-rated dishes and experiences shared by our local food lovers.
+            Discover the top-rated dishes and experiences shared by our local
+            food lovers.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map(r => (
-            <div key={r._id} className="bg-white rounded-3xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 relative">
-              <img src={r.foodImage} alt={r.foodName} className="h-56 w-full object-cover" />
+          {reviews.map((r) => (
+            <div
+              key={r._id}
+              className="bg-white rounded-3xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition duration-300 relative"
+            >
+              <img
+                src={r.foodImage}
+                alt={r.foodName}
+                className="h-56 w-full object-cover"
+              />
               <div className="p-6">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">{r.foodName}</h3>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  {r.foodName}
+                </h3>
                 <p className="text-gray-600 font-medium">{r.restaurantName}</p>
                 <p className="text-gray-500 text-sm mb-3">{r.location}</p>
 
                 <div className="flex justify-between items-center mb-4">
-                  <p className="text-blue-600 font-medium">Reviewer: {r.reviewerName}</p>
+                  <p className="text-blue-600 font-medium">
+                    Reviewer: {r.reviewerName}
+                  </p>
                   <p className="text-yellow-500 font-bold">⭐ {r.rating}</p>
                 </div>
 
@@ -120,11 +144,24 @@ const FeaturedReviews = ({ user }) => {
                   alt={selectedReview.foodName}
                   className="w-full h-56 object-cover rounded-2xl mb-4"
                 />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">{selectedReview.foodName}</h3>
-                <p className="text-gray-600 font-medium mb-2">{selectedReview.restaurantName} — {selectedReview.location}</p>
-                <p className="text-gray-700 italic mb-3">"{selectedReview.reviewText}"</p>
-                <p className="text-yellow-500 font-bold mb-2">⭐ {selectedReview.rating}</p>
-                <p className="text-sm text-gray-500 mb-4">Reviewed by <span className="font-medium text-blue-600">{selectedReview.reviewerName}</span></p>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  {selectedReview.foodName}
+                </h3>
+                <p className="text-gray-600 font-medium mb-2">
+                  {selectedReview.restaurantName} — {selectedReview.location}
+                </p>
+                <p className="text-gray-700 italic mb-3">
+                  "{selectedReview.reviewText}"
+                </p>
+                <p className="text-yellow-500 font-bold mb-2">
+                  ⭐ {selectedReview.rating}
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Reviewed by{" "}
+                  <span className="font-medium text-blue-600">
+                    {selectedReview.reviewerName}
+                  </span>
+                </p>
 
                 <div className="flex gap-4 justify-center">
                   <button
@@ -135,7 +172,9 @@ const FeaturedReviews = ({ user }) => {
                         : "bg-green-600 text-white hover:bg-green-700"
                     } transition`}
                   >
-                    {favorites.includes(selectedReview._id) ? "Remove Favorite" : "Add Favorite"}
+                    {favorites.includes(selectedReview._id)
+                      ? "Remove Favorite"
+                      : "Add Favorite"}
                   </button>
 
                   <button
@@ -150,8 +189,6 @@ const FeaturedReviews = ({ user }) => {
           )}
         </AnimatePresence>
       </section>
-
-      
     </>
   );
 };

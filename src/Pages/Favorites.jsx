@@ -1,130 +1,76 @@
 import React, { useEffect, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 
-const Favorites = ({ user }) => {
+const MyFavorites = ({ user }) => {
   const [favorites, setFavorites] = useState([]);
-  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (user?.email) fetchFavorites();
+    if (!user?.email) return;
+
+    fetch(`http://localhost:3000/favorites/${user.email}`)
+      .then(res => res.json())
+      .then(data => {
+        setFavorites(data.map(fav => fav.reviewId));
+      })
+      .catch(err => console.error("Error fetching favorites:", err));
   }, [user]);
 
-  const fetchFavorites = () => {
-    fetch(`http://localhost:3000/favorites/${user.email}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const validFavorites = data.filter((fav) => fav.reviewId);
-        setFavorites(validFavorites);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleDelete = (reviewId) => {
-    fetch(`http://localhost:3000/favorites/${user.email}/${reviewId}`, {
+  const handleRemove = (id) => {
+    fetch(`http://localhost:3000/favorites/${user.email}/${id}`, {
       method: "DELETE",
-    }).then(() => {
-      fetchFavorites();
-      setDeleteId(null);
-    });
+    })
+      .then(() => {
+        setFavorites(prev => prev.filter(r => r._id !== id));
+        toast.success("Removed from favorites");
+      })
+      .catch(() => toast.error("Failed to remove"));
   };
-
-  if (!user) {
-    return (
-      <div className="max-w-6xl mx-auto p-6 text-center">
-        <h2 className="text-2xl font-bold text-red-600">
-          Please login to see your favorites.
-        </h2>
-      </div>
-    );
-  }
 
   return (
-    <div className="bg-gradient-to-b from-green-50 to-green-100 mx-auto p-6">
-      <h2 className="text-3xl font-bold text-center mb-8 text-green-700">
-        My Favorite Reviews
-      </h2>
-
-      {favorites.length === 0 ? (
-        <p className="text-center text-gray-600 text-lg">
-          No favorites added yet.
-        </p>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-green-100">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
-                  Food Image
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
-                  Food Name
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
-                  Restaurant
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
-                  Location
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {favorites.map((fav) => {
-                const review = fav.reviewId;
-                return (
-                  <tr key={review._id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4">
-                      <img
-                        src={review.foodImage || "https://via.placeholder.com/100"}
-                        alt={review.foodName}
-                        className="h-16 w-16 object-cover rounded-lg"
-                      />
-                    </td>
-                    <td className="px-6 py-4 text-gray-700">{review.foodName}</td>
-                    <td className="px-6 py-4 text-gray-700">{review.restaurantName}</td>
-                    <td className="px-6 py-4 text-gray-500">{review.location}</td>
-                    <td className="px-6 py-4 space-x-2">
-                      <button
-                        onClick={() => setDeleteId(review._id)}
-                        className="px-3 py-1 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+    <section className="bg-gradient-to-b from-green-50 to-green-100 py-20 px-6 min-h-[80vh]">
+      <Toaster position="top-right" />
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-green-700 mb-3">
+            My Favorite Reviews ❤️
+          </h2>
+          <p className="text-gray-700 max-w-2xl mx-auto text-lg md:text-xl">
+            All your saved favorite food reviews in one place!
+          </p>
         </div>
-      )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg space-y-4">
-            <h3 className="text-xl font-bold text-red-600">Confirm Delete</h3>
-            <p>Are you sure you want to remove this favorite? This action cannot be undone.</p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setDeleteId(null)}
-                className="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+        {favorites.length === 0 ? (
+          <p className="text-center text-gray-600 text-lg">No favorites yet 😔</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {favorites.map(r => (
+              <div
+                key={r._id}
+                className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:scale-105"
               >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteId)}
-                className="px-4 py-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
-              >
-                Confirm
-              </button>
-            </div>
+                <img src={r.foodImage} alt={r.foodName} className="h-56 w-full object-cover" />
+                <div className="p-6 space-y-3">
+                  <h3 className="text-2xl font-semibold text-gray-800">{r.foodName}</h3>
+                  <p className="text-gray-600 font-medium">{r.restaurantName}</p>
+                  <p className="text-gray-500 text-sm">{r.location}</p>
+
+                  <div className="flex justify-between items-center">
+                    <p className="text-yellow-500 font-bold">⭐ {r.rating}</p>
+                    <button
+                      onClick={() => handleRemove(r._id)}
+                      className="text-red-600 font-medium hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </section>
   );
 };
 
-export default Favorites;
+export default MyFavorites;

@@ -1,6 +1,10 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router"; // react-router-dom ব্যবহার
 import { Menu, X, Sun, Moon, Search } from "lucide-react";
+import { auth } from "../firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // 🔹 Loading Spinner Component
 const LoadingSpinner = () => (
@@ -14,11 +18,17 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const [dark, setDark] = useState(false);
   const [search, setSearch] = useState("");
-  
-  // 🔹 Dummy user auth state
-  const [user, setUser] = useState({ name: "Badsha", email: "test@gmail.com" });
-  
+  const [user, setUser] = useState(null); // Firebase user state
+
   const navigate = useNavigate();
+
+  // 🔹 Monitor Firebase Auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // 🔹 Public links
   const publicLinks = [
@@ -28,9 +38,9 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  // 🔹 Protected links for logged-in users
+  // 🔹 Protected links
   const protectedLinks = [
-    { name: "Add Review", path: "/add-reveiws" },
+    { name: "Add Review", path: "/add-reviews" },
     { name: "My Reviews", path: "/reviews" },
     { name: "My Favorites", path: "/favorites" },
   ];
@@ -40,14 +50,32 @@ const Navbar = () => {
     setTimeout(() => {
       navigate(path);
       setLoading(false);
-    }, 500);
+    }, 300);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("✅ Logout successful!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Logout failed!");
+    }
   };
 
   return (
     <>
+      <ToastContainer position="top-right" autoClose={3000} />
       {loading && <LoadingSpinner />}
 
-      <div className={`sticky top-0 z-50 shadow-md transition ${dark ? "bg-gray-900 text-white" : "bg-gradient-to-r from-green-600 to-emerald-600 text-white"}`}>
+      <div
+        className={`sticky top-0 z-50 shadow-md transition ${
+          dark
+            ? "bg-gray-900 text-white"
+            : "bg-gradient-to-r from-green-600 to-emerald-600 text-white"
+        }`}
+      >
         <div className="navbar container mx-auto px-4 py-2 flex items-center justify-between">
           {/* LEFT - Logo */}
           <div className="flex items-center gap-2">
@@ -56,7 +84,10 @@ const Navbar = () => {
               src="https://i.ibb.co/8g0f17B4/images-10.jpg"
               alt="Logo"
             />
-            <NavLink to="/" className="text-xl font-bold text-white hover:text-green-200 transition">
+            <NavLink
+              to="/"
+              className="text-xl font-bold text-white hover:text-green-200 transition"
+            >
               Local Food Lovers
             </NavLink>
           </div>
@@ -69,7 +100,9 @@ const Navbar = () => {
                 to={path}
                 className={({ isActive }) =>
                   `relative px-3 py-1 rounded-md transition-all duration-300 ${
-                    isActive ? "bg-white text-green-700 font-semibold shadow-md" : "text-green-100 hover:text-white hover:bg-white/10"
+                    isActive
+                      ? "bg-white text-green-700 font-semibold shadow-md"
+                      : "text-green-100 hover:text-white hover:bg-white/10"
                   }`
                 }
               >
@@ -77,7 +110,6 @@ const Navbar = () => {
               </NavLink>
             ))}
 
-            {/* Protected links only for logged-in users */}
             {user &&
               protectedLinks.map(({ name, path }) => (
                 <NavLink
@@ -115,9 +147,11 @@ const Navbar = () => {
             {/* Auth Buttons */}
             {user ? (
               <>
-                <span className="text-sm font-medium">Hi, <span className="font-bold">{user.name}</span></span>
+                <span className="text-sm font-medium">
+                  Hi, <span className="font-bold">{user.displayName || user.email}</span>
+                </span>
                 <button
-                  onClick={() => setUser(null)}
+                  onClick={handleLogout}
                   className="px-3 py-1 rounded-full bg-white text-green-700 font-medium hover:bg-green-100 transition"
                 >
                   Logout
@@ -182,7 +216,6 @@ const Navbar = () => {
               </NavLink>
             ))}
 
-            {/* Protected links for logged-in users */}
             {user &&
               protectedLinks.map(({ name, path }) => (
                 <NavLink
@@ -200,7 +233,7 @@ const Navbar = () => {
               {user ? (
                 <button
                   onClick={() => {
-                    setUser(null);
+                    handleLogout();
                     setOpen(false);
                   }}
                   className="flex-1 px-4 py-2 rounded-full bg-white text-green-700 font-medium hover:bg-green-100 transition"
