@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 import { useLocation } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
-const AllReviews = ({ user }) => {
+const AllReviews = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const searchQuery = query.get("search")?.toLowerCase() || "";
@@ -13,30 +15,26 @@ const AllReviews = ({ user }) => {
   const [favorites, setFavorites] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
 
-  // Fetch all reviews + user's favorites
+  // 🔹 Load all reviews and user's favorites
   useEffect(() => {
     fetch("http://localhost:3000/FoodLovers")
-      .then(res => res.json())
-      .then(data => {
-        const sorted = data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setReviews(sorted);
-      })
-      .catch(err => console.error(err));
+      .then((res) => res.json())
+      .then((data) => setReviews(data))
+      .catch((err) => console.error("Failed to load reviews:", err));
 
     if (user?.email) {
       fetch(`http://localhost:3000/favorites?userEmail=${encodeURIComponent(user.email)}`)
-        .then(res => res.json())
-        .then(data => setFavorites(data.map(fav => fav.reviewId._id)))
-        .catch(err => console.error(err));
+        .then((res) => res.json())
+        .then((data) => setFavorites(data.map((fav) => fav.reviewId)))
+        .catch((err) => console.error("Failed to load favorites:", err));
     }
   }, [user]);
 
+  // 🔹 Filter search
   useEffect(() => {
     setFilteredReviews(
       reviews.filter(
-        r =>
+        (r) =>
           r.foodName.toLowerCase().includes(searchQuery) ||
           r.restaurantName.toLowerCase().includes(searchQuery) ||
           r.location.toLowerCase().includes(searchQuery)
@@ -44,46 +42,57 @@ const AllReviews = ({ user }) => {
     );
   }, [reviews, searchQuery]);
 
-  // Toggle favorite and update UI instantly
-  const toggleFavorite = (review) => {
-    if (!user) return toast.error("Please login to add favorites");
+  // 🔹 Toggle favorite (add/remove)
+  const toggleFavorite = async (review) => {
+    if (!user) return toast.error("Please login to manage favorites");
 
     const isFav = favorites.includes(review._id);
 
     if (isFav) {
-      fetch(`http://localhost:3000/favorites/${review._id}?userEmail=${encodeURIComponent(user.email)}`, {
-        method: "DELETE",
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to remove");
-          setFavorites(prev => prev.filter(id => id !== review._id));
-          toast.success("Removed from favorites");
-        })
-        .catch(err => toast.error("Failed to remove favorite"));
+      // Find favorite by reviewId and delete
+      const favRes = await fetch(
+        `http://localhost:3000/favorites?userEmail=${encodeURIComponent(user.email)}`
+      );
+      const favList = await favRes.json();
+      const match = favList.find((f) => f.reviewId === review._id);
+
+      if (match) {
+        await fetch(`http://localhost:3000/favorites/${match._id}`, { method: "DELETE" });
+        setFavorites((prev) => prev.filter((id) => id !== review._id));
+        toast.success("Removed from favorites");
+      }
     } else {
-      fetch("http://localhost:3000/favorites", {
+      await fetch("http://localhost:3000/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user.email, reviewId: review._id }),
+        body: JSON.stringify({
+          userEmail: user.email,
+          reviewId: review._id,
+          foodName: review.foodName,
+          foodImage: review.foodImage,
+          restaurantName: review.restaurantName,
+          location: review.location,
+        }),
       })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to add");
-          setFavorites(prev => [...prev, review._id]);
+        .then((res) => {
+          if (!res.ok) throw new Error();
+          setFavorites((prev) => [...prev, review._id]);
           toast.success("Added to favorites");
         })
-        .catch(err => toast.error("Failed to add favorite"));
+        .catch(() => toast.error("Failed to add favorite"));
     }
   };
 
   const handleShare = (review) => {
-    navigator.clipboard.writeText(`Check this food review: ${review.foodName} at ${review.restaurantName}!`);
+    navigator.clipboard.writeText(
+      `Check this food review: ${review.foodName} at ${review.restaurantName}!`
+    );
     toast.success("Copied review info to clipboard!");
   };
 
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
-
       <section className="bg-gradient-to-b from-green-50 to-green-100 py-20 px-6 min-h-[80vh]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -91,7 +100,7 @@ const AllReviews = ({ user }) => {
               All Reviews
             </h2>
             <p className="text-gray-700 max-w-2xl mx-auto text-lg md:text-xl">
-              Discover the best dishes and experiences shared by our local food lovers.
+              Discover the best dishes shared by our food lovers.
             </p>
           </div>
 
@@ -107,7 +116,6 @@ const AllReviews = ({ user }) => {
                   <p className="text-gray-600 font-medium">{r.restaurantName}</p>
                   <p className="text-gray-500 text-sm">{r.location}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <p className="text-blue-600 font-medium text-sm">Reviewer: {r.reviewerName}</p>
                     <p className="text-yellow-500 font-bold">⭐ {r.rating}</p>
                   </div>
 
@@ -135,7 +143,7 @@ const AllReviews = ({ user }) => {
           </div>
         </div>
 
-        {/* Modal */}
+        {/* 🔹 Modal */}
         <AnimatePresence>
           {selectedReview && (
             <motion.div
@@ -162,13 +170,14 @@ const AllReviews = ({ user }) => {
                   alt={selectedReview.foodName}
                   className="w-full h-56 object-cover rounded-2xl mb-4"
                 />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">{selectedReview.foodName}</h3>
-                <p className="text-gray-600 font-medium mb-2">{selectedReview.restaurantName} — {selectedReview.location}</p>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  {selectedReview.foodName}
+                </h3>
+                <p className="text-gray-600 font-medium mb-2">
+                  {selectedReview.restaurantName} — {selectedReview.location}
+                </p>
                 <p className="text-gray-700 italic mb-3">"{selectedReview.reviewText}"</p>
                 <p className="text-yellow-500 font-bold mb-2">⭐ {selectedReview.rating}</p>
-                <p className="text-sm text-gray-500 mb-4">
-                  Reviewed by <span className="font-medium text-blue-600">{selectedReview.reviewerName}</span>
-                </p>
 
                 <div className="flex gap-4 justify-center">
                   <button
@@ -179,7 +188,9 @@ const AllReviews = ({ user }) => {
                         : "bg-green-600 text-white hover:bg-green-700"
                     } transition`}
                   >
-                    {favorites.includes(selectedReview._id) ? "Remove Favorite" : "Add Favorite"}
+                    {favorites.includes(selectedReview._id)
+                      ? "Remove Favorite"
+                      : "Add Favorite"}
                   </button>
                   <button
                     onClick={() => handleShare(selectedReview)}

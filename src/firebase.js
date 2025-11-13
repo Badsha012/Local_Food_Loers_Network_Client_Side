@@ -1,8 +1,9 @@
-// src/firebase.js
+// ✅ Import Firebase SDK functions
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth"; 
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
+// ✅ Firebase configuration (Vite environment variables)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_apiKey,
   authDomain: import.meta.env.VITE_authDomain,
@@ -13,7 +14,16 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_measurementId,
 };
 
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// ✅ Export initialized services
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-export const analytics = getAnalytics(app);
+
+// ✅ Analytics (optional, works only in browsers)
+let analytics;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
+export { app, analytics };

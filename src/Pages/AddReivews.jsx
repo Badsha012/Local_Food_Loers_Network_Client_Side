@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+import { useAuth } from "../hooks/useAuth";
 
-const AddReview = ({ user }) => {
+const AddReview = () => {
+  const { user } = useAuth(); // Get current logged-in user
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     foodName: "",
     foodImage: "",
@@ -12,15 +16,12 @@ const AddReview = ({ user }) => {
     rating: 1,
     reviewText: "",
   });
-  const [loading, setLoading] = useState(false);
 
-  // Corrected handleChange
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setForm((prev) => ({
       ...prev,
-      [name]: name === "rating" ? Number(value) : value, // Rating as number
+      [name]: name === "rating" ? Number(value) : value,
     }));
   };
 
@@ -59,7 +60,7 @@ const AddReview = ({ user }) => {
       if (!res.ok) throw new Error("Failed to add review");
 
       toast.success("Review added successfully!");
-      navigate("/my-reviews"); // Redirect to My Reviews
+      navigate("/my-reviews"); // Redirect after adding review
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong. Try again!");

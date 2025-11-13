@@ -6,9 +6,14 @@ import "react-toastify/dist/ReactToastify.css";
 import './index.css';
 import router from './Router/Router';
 
+import AuthProvider from './Layout/AuthProvider';
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-<RouterProvider router={router}></RouterProvider>
+
+  <AuthProvider>
+    <RouterProvider router={router}></RouterProvider>
+  </AuthProvider>
   </StrictMode>,
 )
